@@ -130,6 +130,7 @@ static int yaf_response_set_body(yaf_response_t *response, char *name, int name_
 int yaf_response_alter_body(yaf_response_t *response, char *name, int name_len, char *body, long body_len, int flag TSRMLS_DC) {
 	zval *zbody, **ppzval;
 	char *obody;
+	long obody_len;
 
 	if (!body_len) {
 		return 1;
@@ -144,27 +145,45 @@ int yaf_response_alter_body(yaf_response_t *response, char *name, int name_len, 
 
 	if (zend_hash_find(Z_ARRVAL_P(zbody), name, name_len + 1, (void **)&ppzval) == FAILURE) {
 		zval *body;
+		obody = NULL;
 		MAKE_STD_ZVAL(body);
-		ZVAL_EMPTY_STRING(body);
+		ZVAL_NULL(body);
 		zend_hash_update(Z_ARRVAL_P(zbody), name, name_len +1, (void **)&body, sizeof(zval *), (void **)&ppzval);
+	} else {
+		obody = Z_STRVAL_PP(ppzval);
+		obody_len = Z_STRLEN_PP(ppzval);
 	}
 
-	obody = Z_STRVAL_PP(ppzval);
+	if (obody) {
+		char *result;
+		long result_len;
 
-	switch (flag) {
-		case YAF_RESPONSE_PREPEND:
-			Z_STRLEN_PP(ppzval) = spprintf(&Z_STRVAL_PP(ppzval), 0, "%s%s", body, obody);
-			break;
-		case YAF_RESPONSE_APPEND:
-			Z_STRLEN_PP(ppzval) = spprintf(&Z_STRVAL_PP(ppzval), 0, "%s%s", obody, body);
-			break;
-		case YAF_RESPONSE_REPLACE:
-		default:
-			ZVAL_STRINGL(*ppzval, body, body_len, 1);
-			break;
+		switch (flag) {
+			case YAF_RESPONSE_PREPEND:
+				result_len = body_len + obody_len;
+				result = emalloc(result_len + 1);
+				memcpy(result, body, body_len);
+				memcpy(result + body_len, obody, obody_len);
+				result[result_len] = '\0';
+				ZVAL_STRINGL(*ppzval, result, result_len, 0);
+				break;
+			case YAF_RESPONSE_APPEND:
+				result_len = body_len + obody_len;
+				result = emalloc(result_len + 1);
+				memcpy(result, obody, obody_len);
+				memcpy(result + obody_len, body, body_len);
+				result[result_len] = '\0';
+				ZVAL_STRINGL(*ppzval, result, result_len, 0);
+				break;
+			case YAF_RESPONSE_REPLACE:
+			default:
+				ZVAL_STRINGL(*ppzval, body, body_len, 1);
+				break;
+		}
+		efree(obody);
+	} else {
+		ZVAL_STRINGL(*ppzval, body, body_len, 1);
 	}
-
-	efree(obody);
 
 	return 1;
 }
@@ -244,13 +263,13 @@ PHP_METHOD(yaf_response, __construct) {
 }
 /* }}} */
 
-/** {{{ proto public Yaf_Response_Abstract::__desctruct(void)
+/** {{{ proto public Yaf_Response_Abstract::__destruct(void)
 */
 PHP_METHOD(yaf_response, __destruct) {
 }
 /* }}} */
 
-/** {{{ proto public Yaf_Response_Abstract::appenBody($body, $name = NULL)
+/** {{{ proto public Yaf_Response_Abstract::appendBody($body, $name = NULL)
 */
 PHP_METHOD(yaf_response, appendBody) {
 	char		*body, *name = NULL;
@@ -295,6 +314,7 @@ PHP_METHOD(yaf_response, prependBody) {
 /** {{{ proto public Yaf_Response_Abstract::setHeader($name, $value, $replace = 0)
 */
 PHP_METHOD(yaf_response, setHeader) {
+	/* todo: implement */
 	RETURN_FALSE;
 }
 /* }}} */
@@ -302,6 +322,7 @@ PHP_METHOD(yaf_response, setHeader) {
 /** {{{ proto protected Yaf_Response_Abstract::setAllHeaders(void)
 */
 PHP_METHOD(yaf_response, setAllHeaders) {
+	/* todo: implement */
 	RETURN_FALSE;
 }
 /* }}} */
@@ -309,6 +330,7 @@ PHP_METHOD(yaf_response, setAllHeaders) {
 /** {{{ proto public Yaf_Response_Abstract::getHeader(void)
 */
 PHP_METHOD(yaf_response, getHeader) {
+	/* todo: implement */
 	RETURN_NULL();
 }
 /* }}} */
@@ -316,6 +338,7 @@ PHP_METHOD(yaf_response, getHeader) {
 /** {{{ proto public Yaf_Response_Abstract::clearHeaders(void)
 */
 PHP_METHOD(yaf_response, clearHeaders) {
+	/* todo: implement */
 	RETURN_FALSE;
 }
 /* }}} */

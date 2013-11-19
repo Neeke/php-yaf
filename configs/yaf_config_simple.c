@@ -226,7 +226,7 @@ PHP_METHOD(yaf_config_simple, offsetUnset) {
 			return;
 		}
 
-		if (Z_TYPE_P(name) != IS_STRING || Z_TYPE_P(name) != IS_STRING) {
+		if (Z_TYPE_P(name) != IS_STRING || !Z_STRLEN_P(name)) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Expect a string key name");
 			RETURN_FALSE;
 		}
@@ -314,7 +314,7 @@ PHP_METHOD(yaf_config_simple, next) {
 */
 PHP_METHOD(yaf_config_simple, valid) {
 	zval *prop = zend_read_property(yaf_config_simple_ce, getThis(), ZEND_STRL(YAF_CONFIG_PROPERT_NAME), 1 TSRMLS_CC);
-	RETURN_LONG(zend_hash_has_more_elements(Z_ARRVAL_P(prop)) == SUCCESS);
+	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL_P(prop)) == SUCCESS);
 }
 /* }}} */
 

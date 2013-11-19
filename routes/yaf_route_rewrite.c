@@ -69,9 +69,9 @@ yaf_route_t * yaf_route_rewrite_instance(yaf_route_t *this_ptr, zval *match, zva
 }
 /* }}} */
 
-/** {{{ static zval * yaf_route_rewrite_match(yaf_route_t *router, char *uir, int len TSRMLS_DC)
+/** {{{ static zval * yaf_route_rewrite_match(yaf_route_t *router, char *uri, int len TSRMLS_DC)
  */
-static zval * yaf_route_rewrite_match(yaf_route_t *router, char *uir, int len TSRMLS_DC) {
+static zval * yaf_route_rewrite_match(yaf_route_t *router, char *uri, int len TSRMLS_DC) {
 	char *seg, *pmatch, *ptrptr;
 	int  seg_len;
 	zval *match;
@@ -127,7 +127,7 @@ static zval * yaf_route_rewrite_match(yaf_route_t *router, char *uir, int len TS
 		MAKE_STD_ZVAL(subparts);
 		ZVAL_NULL(subparts);
 
-		php_pcre_match_impl(pce_regexp, uir, len, &matches, subparts /* subpats */,
+		php_pcre_match_impl(pce_regexp, uri, len, &matches, subparts /* subpats */,
 				0/* global */, 0/* ZEND_NUM_ARGS() >= 4 */, 0/*flags PREG_OFFSET_CAPTURE*/, 0/* start_offset */ TSRMLS_CC);
 
 		if (!zend_hash_num_elements(Z_ARRVAL_P(subparts))) {
@@ -243,7 +243,7 @@ int yaf_route_rewrite_route(yaf_route_t *router, yaf_request_t *request TSRMLS_D
 }
 /* }}} */
 
-/** {{{ proto public Yaf_Route_Rewrite::route(Yaf_Request_Abstarct $request)
+/** {{{ proto public Yaf_Route_Rewrite::route(Yaf_Request_Abstract $request)
  */
 PHP_METHOD(yaf_route_rewrite, route) {
 	yaf_route_t 	*route;
